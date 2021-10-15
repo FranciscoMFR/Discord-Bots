@@ -145,6 +145,7 @@ if db["wip"] == False:
     if any(word in arg for word in riddle_answer):
       await ctx.send(file=discord.File("mapa.PNG"))
 
+  #@Client.command()
 
 keep_alive()
 Client.run(os.environ['TOKEN'])
