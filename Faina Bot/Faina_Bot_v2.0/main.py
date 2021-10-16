@@ -81,57 +81,46 @@ def delete_riddles(index):
 async def on_ready():
     print('We have logged in as {0.user} v2.0'.format(Client))
 
-
-@Client.command()
-async def wip(ctx):
-    db["wip"] = True
-    db["responding"] = False
-    print(db["wip"])
+@Client.command(brief='WIP mode ON/OFF', description='Turn ON or OFF the mode where the BOT is in maintenance.')
+async def wipSwitch(ctx):
+  db["wip"] = not db["wip"]
+  if db["wip"]:
     await ctx.send('A entrar em manutenção! Até já! @everyone')
-
-
-@Client.command()
-async def work(ctx):
-    db["wip"] = False
-    db["responding"] = True
     print(db["wip"])
+  else:
     await ctx.send('Estou de volta ao ativo!Bota trabalhar! @everyone')
+    print(db["wip"])
 
-
-@Client.command()
+@Client.command(brief='Show the BOT status', description='Says to you if the BOT are in maintenance or not.')
 async def wipStatus(ctx):
     if db["wip"]:
         await ctx.send('Encontro-me em manutenção!')
     else:
         await ctx.send('Estou on the work!')
 
-@Client.command()
+@Client.command(brief='Show the tts status', description='Says to you if the BOT can use tts or not.')
 async def ttsStatus(ctx):
     if db["tts"]:
         await ctx.send('Estou habilitado a parlar com vocês!')
     else:
         await ctx.send('*Gri Gri Gri*')
 
-@Client.command()
+@Client.command(brief='Show the riddle status', description='Says to you if the riddle game is available.')
 async def riddleStatus(ctx):
     if db["riddleStatus"]:
         await ctx.send("Estou apto a desafiar-te!")
     else:
         await ctx.send("Estou cansado de desafios! Espera até mais logo!")
 
-@Client.command()
-async def shutup(ctx):
-    db["tts"] = False
+@Client.command(brief='tts mode ON/OFF', description='Turn ON or OFF the mode where the BOT can send message in text to speech.')
+async def ttsSwitch(ctx):
+  db["tts"] = not db["tts"]
+  if db["tts"]:
+    await ctx.send("Yey já posso falar!")
+  else:
     await ctx.send("Ok ok já me vou calar!")
 
-
-@Client.command()
-async def speak(ctx):
-    db["tts"] = True
-    await ctx.send("Yey já posso falar!")
-
-
-@Client.command()
+@Client.command(brief='Riddle mode ON/OFF', description='Turn ON or OFF the riddle game. This command influence other commands.')
 async def riddleSwitch(ctx):
     db["riddleStatus"] = not db["riddleStatus"]
     if db["riddleStatus"]:
@@ -144,14 +133,14 @@ async def riddleSwitch(ctx):
             tts=db["tts"])
     await ctx.send("@everyone")
 
-@Client.command()
+@Client.command(brief='BOT congratz you', description='BOT will say hello to you.Just for fun.')
 async def hello(ctx):
   if not db["wip"]:
     await ctx.send('Sup {0}!'.format(ctx.author.mention), tts=db["tts"])
   else:
     await ctx.send("Faz-me o favor de não me chateares **ENQUANTO ESTOU A LEVAR UPGRADE!**{0}".format(ctx.author.mention))
 
-@Client.command()
+@Client.command(brief='BOT send an encouragement message', description='This command will send a random encouragement message from a random API.')
 async def sad(ctx):
   if not db["wip"]:
     quote = get_quote()
@@ -197,7 +186,7 @@ async def deleteRiddle(ctx, arg):
   else:
     await ctx.send("Faz-me o favor de não me chateares **ENQUANTO ESTOU A LEVAR UPGRADE!**{0}".format(ctx.author.mention))
 
-@Client.command()
+@Client.command(brief='Show the riddle or encouragements lists', description='This command shows the riddle list if you use "riddles" in <arg> and shows the encouragements list if you use "encouragements" in <arg>.')
 async def see(ctx, arg):
   if not db["wip"]:
     lst = []
@@ -207,14 +196,14 @@ async def see(ctx, arg):
   else:
     await ctx.send("Faz-me o favor de não me chateares **ENQUANTO ESTOU A LEVAR UPGRADE!**{0}".format(ctx.author.mention))
 
-@Client.command()
+@Client.command(brief='BOT send a message', description='This command send a text to spech messado to the channel if the tts mode is ON.')
 async def tts(ctx, arg):
   if not db["wip"]:
     await ctx.send(arg, tts=db["tts"])
   else:
     await ctx.send("Faz-me o favor de não me chateares **ENQUANTO ESTOU A LEVAR UPGRADE!**{0}".format(ctx.author.mention))
 
-@Client.command()
+@Client.command(brief='Map location', description='This command sends a special image.')
 async def local(ctx):
   if not db["wip"]:
     await ctx.send(file=discord.File("mapa.PNG"))
@@ -222,7 +211,7 @@ async def local(ctx):
     await ctx.send("Faz-me o favor de não me chateares **ENQUANTO ESTOU A LEVAR UPGRADE!**{0}".format(ctx.author.mention))
 
 
-@Client.command()
+@Client.command(brief='Show one riddle by number', description='Show a riddle that whould be chosed by the number, default number is 0.')
 async def riddle(ctx, num=0):
   if not db["wip"]:
     if db["riddleStatus"]:
@@ -234,7 +223,7 @@ async def riddle(ctx, num=0):
   else:
     await ctx.send("Faz-me o favor de não me chateares **ENQUANTO ESTOU A LEVAR UPGRADE!**{0}".format(ctx.author.mention))
 
-@Client.command()
+@Client.command(brief='Answer a specific riddle by number', description='With this command you can answer a specific riddle by the number, if you answer correctly BOT send to you a DM with a congratx message and the prize.')
 async def answer(ctx, num, arg):
   if not db["wip"]:
     if db["riddleStatus"]:
@@ -252,35 +241,17 @@ async def answer(ctx, num, arg):
   else:
     await ctx.send("Faz-me o favor de não me chateares ENQUANTO ESTOU A LEVAR UPGRADE!{0}".format(ctx.author.mention))
 
-@Client.command()
+@Client.command(brief='Clear message from channel', description='Clear a certain number of messagem from the chat, by default is 5 messages.')
 async def clear(ctx, amount=5):
   await ctx.channel.purge(limit=amount)
 
-@Client.command()
+@Client.command(brief='BOT send a DM to specific user', description='With this command you can send a DM to someone in this discord channel using his tag.')
 async def dm(ctx, user: discord.User, *, msg=None):
   if not db["wip"]:
     msg = msg or 'Oi gustosuh!!'
     await user.send(msg)
   else:
     await ctx.send("Faz-me o favor de não me chateares ENQUANTO ESTOU A LEVAR UPGRADE!{0}".format(ctx.author.mention))
-'''
-@Client.command()
-async def help(ctx):
-  helptext = "```"
-  for command in Client.commands:
-    helptext+=f"{command}\n"
-  helptext+="```"
-  await ctx.send(helptext)'''
-
-'''
-@bot.command(name="help", description="Returns all commands available")
-async def help(ctx):
-    helptext = "```"
-    for command in self.bot.commands:
-        helptext+=f"{command}\n"
-    helptext+="```"
-    await ctx.send(helptext)
-'''
 
 keep_alive()
 Client.run(os.environ['TOKEN'])
