@@ -7,204 +7,280 @@ import random
 from replit import db
 from keep_alive import keep_alive
 
-
 Client = Bot(command_prefix='!')
 
-sad_words = ["triste", "deprimido", "deprimida", "infeliz", "chateado", "chateada", "deprimente"]
+sad_words = [
+    "triste", "deprimido", "deprimida", "infeliz", "chateado", "chateada",
+    "deprimente"
+]
 
-riddle_question = ["O que tem de ser partido antes de o puderes usar?", "O que é que está sempre à tua frente, mas não consegues ver?"]
+riddle_question = [
+    "O que tem de ser partido antes de o puderes usar?",
+    "O que é que está sempre à tua frente, mas não consegues ver?"
+]
 riddle_answer = [["Toalha", "toalha"], ["Ovo", "ovo"], ["Futuro", "futuro"]]
 maps = ["mapa_pt1.PNG", "mapa_pt2.PNG"]
 
 starter_encouragements = [
-  "Cheer up!",
-  "Hang in there.",
-  "You are a great person!"
+    "Cheer up!", "Hang in there.", "You are a great person!"
 ]
 
 if "tts" not in db.keys():
-  db["tts"] = True
+    db["tts"] = True
 
 if "responding" not in db.keys():
-  db["responding"] = True 
+    db["responding"] = True
 
 if "wip" not in db.keys():
-  db["wip"] = False
+    db["wip"] = False
 
 if "riddleStatus" not in db.keys():
-  db["riddleStatus"] = False
+    db["riddleStatus"] = False
+
 
 def get_quote():
-  response = requests.get("https://zenquotes.io/api/random")
-  json_data = json.loads(response.text)
-  quote = json_data[0]['q'] + " - " + json_data[0]['a']
-  return quote
+    response = requests.get("https://zenquotes.io/api/random")
+    json_data = json.loads(response.text)
+    quote = json_data[0]['q'] + " - " + json_data[0]['a']
+    return quote
+
 
 def update_encouragements(encouraging_message):
-  if "encouragements" in db.keys():
-    encouragements = db["encouragements"]
-    encouragements.append(encouraging_message)
-    db["encouragements"] = encouragements
-  else:
-    db["encouragements"] = [encouraging_message]
+    if "encouragements" in db.keys():
+        encouragements = db["encouragements"]
+        encouragements.append(encouraging_message)
+        db["encouragements"] = encouragements
+    else:
+        db["encouragements"] = [encouraging_message]
+
 
 def delete_encouragement(index):
-  encouragements = db["encouragements"]
-  if len(encouragements) > index:
-    del encouragements[index]
-    db["encouragements"] = encouragements
+    encouragements = db["encouragements"]
+    if len(encouragements) > index:
+        del encouragements[index]
+        db["encouragements"] = encouragements
+
 
 def update_riddles(riddle):
-  if "riddles" in db.keys():
-    riddles = db["riddles"]
-    riddles.append(riddle)
-    db["riddles"] = riddles
-  else:
-    db["riddles"] = riddle
+    if "riddles" in db.keys():
+        riddles = db["riddles"]
+        riddles.append(riddle)
+        db["riddles"] = riddles
+    else:
+        db["riddles"] = riddle
+
 
 def delete_riddles(index):
-  riddles = db["riddles"]
-  if len(riddles) > index:
-    del riddles[index]
-    db["riddles"] = riddles
+    riddles = db["riddles"]
+    if len(riddles) > index:
+        del riddles[index]
+        db["riddles"] = riddles
+
 
 @Client.event
 async def on_ready():
-  print('We have logged in as {0.user} v2.0'.format(Client))
+    print('We have logged in as {0.user} v2.0'.format(Client))
+
 
 @Client.command()
 async def wip(ctx):
-  db["wip"] = True
-  db["responding"] = False
-  print(db["wip"])
-  await ctx.send('A entrar em manutenção! Até já! @everyone')
+    db["wip"] = True
+    db["responding"] = False
+    print(db["wip"])
+    await ctx.send('A entrar em manutenção! Até já! @everyone')
+
 
 @Client.command()
 async def work(ctx):
-  db["wip"] = False
-  db["responding"] = True
-  print(db["wip"])
-  await ctx.send('Estou de volta ao ativo!Bota trabalhar! @everyone')
+    db["wip"] = False
+    db["responding"] = True
+    print(db["wip"])
+    await ctx.send('Estou de volta ao ativo!Bota trabalhar! @everyone')
+
 
 @Client.command()
-async def wipstatus(ctx):
-  if db["wip"]:
-    await ctx.send('Encontro-me em manutenção!')
-  else:
-    await ctx.send('Estou on the work!')
+async def wipStatus(ctx):
+    if db["wip"]:
+        await ctx.send('Encontro-me em manutenção!')
+    else:
+        await ctx.send('Estou on the work!')
 
 @Client.command()
-async def shutup(ctx):
-  db["tts"] = False
-  await ctx.send("Ok ok já me vou calar!")
-
-@Client.command()
-async def speak(ctx):
-  db["tts"] = True
-  await ctx.send("Yey já posso falar!")
-
-@Client.command()
-async def ttsstatus(ctx):
-  if db["tts"]:
-    await ctx.send('Estou habilitado a parlar com vocês!')
-  else:
-    await ctx.send('*Gri Gri Gri*')
+async def ttsStatus(ctx):
+    if db["tts"]:
+        await ctx.send('Estou habilitado a parlar com vocês!')
+    else:
+        await ctx.send('*Gri Gri Gri*')
 
 @Client.command()
 async def riddleStatus(ctx):
-  if db["riddleStatus"]:
-    await ctx.send("Estou apto a desafiar-te!")
-  else:
-    await ctx.send("Estou cansado de desafios! Espera até mais logo!")
+    if db["riddleStatus"]:
+        await ctx.send("Estou apto a desafiar-te!")
+    else:
+        await ctx.send("Estou cansado de desafios! Espera até mais logo!")
+
+@Client.command()
+async def shutup(ctx):
+    db["tts"] = False
+    await ctx.send("Ok ok já me vou calar!")
+
+
+@Client.command()
+async def speak(ctx):
+    db["tts"] = True
+    await ctx.send("Yey já posso falar!")
+
 
 @Client.command()
 async def riddleSwitch(ctx):
-  db["riddleStatus"] = not db["riddleStatus"]
-  if db["riddleStatus"]:
-    await ctx.send("Malta está na hora das adivinhas! Juntem-se todos aqui à minha voltinha!", tts=db["tts"])
-  else:
-    await ctx.send("Quem foi ao mar perdeu o lugar! Por isso se foste à ria ficaste sem adivinha!", tts=db["tts"])
-  await ctx.send("@everyone")
+    db["riddleStatus"] = not db["riddleStatus"]
+    if db["riddleStatus"]:
+        await ctx.send(
+            "Malta está na hora das adivinhas! Juntem-se todos aqui à minha voltinha!",
+            tts=db["tts"])
+    else:
+        await ctx.send(
+            "Quem foi ao mar perdeu o lugar! Por isso se foste à ria ficaste sem adivinha!",
+            tts=db["tts"])
+    await ctx.send("@everyone")
 
-if db["wip"] == False:
-  @Client.command()
-  async def hello(ctx):
+@Client.command()
+async def hello(ctx):
+  if not db["wip"]:
     await ctx.send('Sup {0}!'.format(ctx.author.mention), tts=db["tts"])
+  else:
+    await ctx.send("Faz-me o favor de não me chateares **ENQUANTO ESTOU A LEVAR UPGRADE!**{0}".format(ctx.author.mention))
 
-  @Client.command()
-  async def sad(ctx):
+@Client.command()
+async def sad(ctx):
+  if not db["wip"]:
     quote = get_quote()
     await ctx.channel.send(quote)
+  else:
+    await ctx.send("Faz-me o favor de não me chateares **ENQUANTO ESTOU A LEVAR UPGRADE!**{0}".format(ctx.author.mention))
 
-  @Client.command()
-  async def new(ctx, arg):
+@Client.command()
+async def new(ctx, arg):
+  if not db["wip"]:
     encouraging_message = arg
     update_encouragements(encouraging_message)
     await ctx.send("Nova mensagem adicionada.")
+  else:
+    await ctx.send("Faz-me o favor de não me chateares **ENQUANTO ESTOU A LEVAR UPGRADE!**{0}".format(ctx.author.mention))
 
-  @Client.command()
-  async def newRiddle(ctx, arg):
+@Client.command()
+async def newRiddle(ctx, arg):
+  if not db["wip"]:
     riddle = arg
     update_riddles(riddle)
     await ctx.send("Nova riddle adicionada.")
+  else:
+    await ctx.send("Faz-me o favor de não me chateares **ENQUANTO ESTOU A LEVAR UPGRADE!**{0}".format(ctx.author.mention))
 
-  @Client.command()
-  async def delete(ctx, arg):
+@Client.command()
+async def delete(ctx, arg):
+  if not db["wip"]:
     if "encouragements" in db.keys():
       aux = db["encouragements"][int(arg)]
       delete_encouragement(int(arg))
-    await ctx.send("A frase [" + aux + "] foi eliminada")
+      await ctx.send("A frase [" + aux + "] foi eliminada")
+  else:
+    await ctx.send("Faz-me o favor de não me chateares **ENQUANTO ESTOU A LEVAR UPGRADE!**{0}".format(ctx.author.mention))
 
-  @Client.command()
-  async def deleteRiddle(ctx, arg):
+@Client.command()
+async def deleteRiddle(ctx, arg):
+  if not db["wip"]:
     if "riddles" in db.keys():
       aux = db["riddles"][int(arg)]
       delete_riddles(int(arg))
-    await ctx.send("A riddle [" + aux + "] foi eliminada")
+      await ctx.send("A riddle [" + aux + "] foi eliminada")
+  else:
+    await ctx.send("Faz-me o favor de não me chateares **ENQUANTO ESTOU A LEVAR UPGRADE!**{0}".format(ctx.author.mention))
 
-  @Client.command()
-  async def see(ctx, arg):
+@Client.command()
+async def see(ctx, arg):
+  if not db["wip"]:
     lst = []
     if arg in db.keys():
       lst = db[arg]
-    await ctx.send(list(lst))
+      await ctx.send(list(lst))
+  else:
+    await ctx.send("Faz-me o favor de não me chateares **ENQUANTO ESTOU A LEVAR UPGRADE!**{0}".format(ctx.author.mention))
 
-  @Client.command()
-  async def tts(ctx, arg):
+@Client.command()
+async def tts(ctx, arg):
+  if not db["wip"]:
     await ctx.send(arg, tts=db["tts"])
+  else:
+    await ctx.send("Faz-me o favor de não me chateares **ENQUANTO ESTOU A LEVAR UPGRADE!**{0}".format(ctx.author.mention))
 
-  @Client.command()
-  async def local(ctx):
+@Client.command()
+async def local(ctx):
+  if not db["wip"]:
     await ctx.send(file=discord.File("mapa.PNG"))
+  else:
+    await ctx.send("Faz-me o favor de não me chateares **ENQUANTO ESTOU A LEVAR UPGRADE!**{0}".format(ctx.author.mention))
 
-  if db["riddleStatus"]:
-    @Client.command()
-    async def riddle(ctx, num=0):
-      if db["riddleStatus"]:
-        await ctx.send(db["riddles"][int(num)], tts=db["tts"])
+
+@Client.command()
+async def riddle(ctx, num=0):
+  if not db["wip"]:
+    if db["riddleStatus"]:
+      await ctx.send(db["riddles"][int(num)], tts=db["tts"])
+    else:
+      await ctx.send(
+                      "Não há adivinhas para ninguém! Muito menos para ti {0}!".
+                      format(ctx.author.mention))
+  else:
+    await ctx.send("Faz-me o favor de não me chateares **ENQUANTO ESTOU A LEVAR UPGRADE!**{0}".format(ctx.author.mention))
+
+@Client.command()
+async def answer(ctx, num, arg):
+  if not db["wip"]:
+    if db["riddleStatus"]:
+      if any(word in arg for word in riddle_answer[int(num)]):
+        await ctx.author.send(
+                          "Parabéns acertaste! Toma lá um biscoito!")
+        await ctx.author.send(file=discord.File(maps[int(num)]))
       else:
-        await ctx.send("Não há adivinhas para ninguém! Muito menos para ti {0}!".format(ctx.author.mention))
+        await ctx.author.send(
+                          "Erraste! Não mereces ser empreendedor!")
+    else:
+      await ctx.send(
+                      "Não aceito a tua resposta! Estou em modo PISTOLA!{0}".
+                      format(ctx.author.mention))
+  else:
+    await ctx.send("Faz-me o favor de não me chateares ENQUANTO ESTOU A LEVAR UPGRADE!{0}".format(ctx.author.mention))
 
-    @Client.command()
-    async def answer(ctx, num, arg):
-      if db["riddleStatus"]:
-        if any(word in arg for word in riddle_answer[int(num)]):
-          await ctx.author.send("Parabéns acertaste! Toma lá um biscoito!")
-          await ctx.author.send(file=discord.File(maps[int(num)]))
-        else:
-          await ctx.author.send("Erraste! Não mereces ser empreendedor!")
-      else:
-        await ctx.send("Não aceito a tua resposta! Estou em modo PISTOLA!{0}".format(ctx.author.mention))
+@Client.command()
+async def clear(ctx, amount=5):
+  await ctx.channel.purge(limit=amount)
 
-  @Client.command()
-  async def clear(ctx, amount = 5):
-    await ctx.channel.purge(limit=amount)
-
-  @Client.command()
-  async def dm(ctx, user: discord.User, *, msg=None):
+@Client.command()
+async def dm(ctx, user: discord.User, *, msg=None):
+  if not db["wip"]:
     msg = msg or 'Oi gustosuh!!'
     await user.send(msg)
+  else:
+    await ctx.send("Faz-me o favor de não me chateares ENQUANTO ESTOU A LEVAR UPGRADE!{0}".format(ctx.author.mention))
+'''
+@Client.command()
+async def help(ctx):
+  helptext = "```"
+  for command in Client.commands:
+    helptext+=f"{command}\n"
+  helptext+="```"
+  await ctx.send(helptext)'''
 
+'''
+@bot.command(name="help", description="Returns all commands available")
+async def help(ctx):
+    helptext = "```"
+    for command in self.bot.commands:
+        helptext+=f"{command}\n"
+    helptext+="```"
+    await ctx.send(helptext)
+'''
 
 keep_alive()
 Client.run(os.environ['TOKEN'])
