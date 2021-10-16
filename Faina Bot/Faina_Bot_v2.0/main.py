@@ -112,12 +112,24 @@ async def ttsstatus(ctx):
 
 @Client.command()
 async def riddleStatus(ctx):
+  if db["riddleStatus"]:
+    await ctx.send("Estou apto a desafiar-te!")
+  else:
+    await ctx.send("Estou cansado de desafios! Espera até mais logo!")
+
+@Client.command()
+async def riddleSwitch(ctx):
   db["riddleStatus"] = not db["riddleStatus"]
+  if db["riddleStatus"]:
+    await ctx.send("Malta está na hora das adivinhas! Juntem-se todos aqui à minha voltinha!", tts=db["tts"])
+  else:
+    await ctx.send("Quem foi ao mar perdeu o lugar! Por isso se foste à ria ficaste sem adivinha!", tts=db["tts"])
+  await ctx.send("@everyone")
 
 if db["wip"] == False:
   @Client.command()
   async def hello(ctx):
-    await ctx.send('Sup {0}!'.format(ctx.author.mention))
+    await ctx.send('Sup {0}!'.format(ctx.author.mention), tts=db["tts"])
 
   @Client.command()
   async def sad(ctx):
@@ -168,15 +180,21 @@ if db["wip"] == False:
   if db["riddleStatus"]:
     @Client.command()
     async def riddle(ctx, num=0):
-      await ctx.send(db["riddles"][int(num)], tts=db["tts"])
+      if db["riddleStatus"]:
+        await ctx.send(db["riddles"][int(num)], tts=db["tts"])
+      else:
+        await ctx.send("Não há adivinhas para ninguém! Muito menos para ti {0}!".format(ctx.author.mention))
 
     @Client.command()
     async def answer(ctx, num, arg):
-      if any(word in arg for word in riddle_answer[int(num)]):
-        await ctx.author.send("O espertinho {0} acertou! Verifica as mensagens privadas!".format(ctx.author.mention), tts=db["tts"])
-        await ctx.author.send(file=discord.File(maps[int(num)]))
+      if db["riddleStatus"]:
+        if any(word in arg for word in riddle_answer[int(num)]):
+          await ctx.author.send("Parabéns acertaste! Toma lá um biscoito!")
+          await ctx.author.send(file=discord.File(maps[int(num)]))
+        else:
+          await ctx.author.send("Erraste! Não mereces ser empreendedor!")
       else:
-        await ctx.author.send("Erraste! Não mereces ser empreendedor!")
+        await ctx.send("Não aceito a tua resposta! Estou em modo PISTOLA!{0}".format(ctx.author.mention))
 
   @Client.command()
   async def clear(ctx, amount = 5):
